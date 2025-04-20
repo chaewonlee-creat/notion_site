@@ -7,6 +7,10 @@ import fs from "fs/promises";
 config({ path: '.env.local' });
 
 (async () => {
+  // 토큰 디버깅을 위한 로그 추가
+  console.log('Notion Secret:', process.env.NOTION_SECRET ? '***' + process.env.NOTION_SECRET.slice(-4) : 'undefined');
+  console.log('Database ID:', process.env.NOTION_DATABASE_ID);
+
   const notion = new Client({ auth: process.env.NOTION_SECRET });
   const n2m = new NotionToMarkdown({ notionClient: notion });
 
