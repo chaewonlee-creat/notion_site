@@ -37,6 +37,8 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
 
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       # Node 설치
       - uses: actions/setup-node@v4
