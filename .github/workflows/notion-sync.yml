@@ -27,6 +27,9 @@ jobs:
         env:
           NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       # 변경 사항 커밋 (없으면 스킵)
       - run: |
@@ -37,4 +40,10 @@ jobs:
           git push
         env:
           # GitHub 토큰은 기본으로 주어지는 ${{ secrets.GITHUB_TOKEN }} 사용
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Vercel 배포 트리거
+      - name: Trigger Vercel Deployment
+        run: |
+          curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_pJNRqpYuOwajgzTJMamyVZh1RNap" \
+          -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" 
