@@ -39,30 +39,31 @@ jobs:
       # 프로젝트 파일 다운로드
       - name: Download project files
         run: |
-          mkdir -p src/content
+          mkdir -p src/content scripts
           curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3.raw" \
             -o package.json \
             "https://api.github.com/repos/${{ github.repository }}/contents/package.json"
           curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3.raw" \
-            -o .env.local \
-            "https://api.github.com/repos/${{ github.repository }}/contents/.env.local"
-          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3.raw" \
             -o scripts/notionSync.mjs \
             "https://api.github.com/repos/${{ github.repository }}/contents/scripts/notionSync.mjs"
 
-      # Node 설치
+      # Node 설치 및 의존성 설치
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
+      - run: npm install @notionhq/client notion-to-md dotenv
 
-      # 의존성 설치
-      - run: npm ci
-
-      # Notion → Markdown 변환
-      - run: npm run sync:notion
+      # Notion → Markdown 변환 (git 없이)
+      - name: Run notion sync
+        run: |
+          cat > .env.local << EOL
+          NOTION_SECRET=${{ secrets.NOTION_SECRET }}
+          NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
+          EOL
+          node scripts/notionSync.mjs
 
       # Vercel 배포 트리거
       - name: Trigger Vercel Deployment
