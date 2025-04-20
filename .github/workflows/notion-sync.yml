@@ -1,0 +1,37 @@
+name: notion-sync
+
+on:
+  # ❶ 6시간마다 자동
+  schedule:
+    - cron:  '0 */6 * * *'
+  # ❷ 수동 실행 버튼도 하나 만들기
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 설치
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 의존성 설치
+      - run: npm ci
+
+      # Notion → Markdown 변환
+      - run: npm run sync:notion
+
+      # 변경 사항 커밋 (없으면 스킵)
+      - run: |
+          git config user.name "notion-bot"
+          git config user.email "bot@example.com"
+          git add src/content
+          git commit -m "auto: notion sync" || exit 0
+          git push
+        env:
+          # GitHub 토큰은 기본으로 주어지는 ${{ secrets.GITHUB_TOKEN }} 사용
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
