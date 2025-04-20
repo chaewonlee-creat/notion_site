@@ -1,8 +1,5 @@
 name: notion-sync
 
-permissions:
-  contents: write
-
 on:
   # ❶ 6시간마다 자동
   schedule:
@@ -51,14 +48,6 @@ jobs:
 
       # Notion → Markdown 변환
       - run: npm run sync:notion
-
-      # 변경 사항 커밋 (없으면 스킵)
-      - run: |
-          git config user.name "notion-bot"
-          git config user.email "bot@example.com"
-          git add src/content
-          git commit -m "auto: notion sync" || exit 0
-          git push https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git HEAD:main
 
       # Vercel 배포 트리거
       - name: Trigger Vercel Deployment
