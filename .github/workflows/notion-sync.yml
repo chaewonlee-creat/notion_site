@@ -1,5 +1,8 @@
 name: notion-sync
 
+permissions:
+  contents: write
+
 on:
   # ❶ 6시간마다 자동
   schedule:
