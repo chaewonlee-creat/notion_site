@@ -36,9 +36,22 @@ jobs:
           NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
 
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
+      # 프로젝트 파일 다운로드
+      - name: Download project files
+        run: |
+          mkdir -p src/content
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3.raw" \
+            -o package.json \
+            "https://api.github.com/repos/${{ github.repository }}/contents/package.json"
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3.raw" \
+            -o .env.local \
+            "https://api.github.com/repos/${{ github.repository }}/contents/.env.local"
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3.raw" \
+            -o scripts/notionSync.mjs \
+            "https://api.github.com/repos/${{ github.repository }}/contents/scripts/notionSync.mjs"
 
       # Node 설치
       - uses: actions/setup-node@v4
@@ -50,14 +63,6 @@ jobs:
 
       # Notion → Markdown 변환
       - run: npm run sync:notion
-
-      # # 변경 사항 커밋 (없으면 스킵)
-      # - run: |
-      #     git config user.name "notion-bot"
-      #     git config user.email "bot@example.com"
-      #     git add src/content
-      #     git commit -m "auto: notion sync" || exit 0
-      #     git push https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git HEAD:main
 
       # Vercel 배포 트리거
       - name: Trigger Vercel Deployment
