@@ -53,7 +53,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+
       - run: npm install @notionhq/client notion-to-md dotenv
 
       # Notion → Markdown 변환 (git 없이)
