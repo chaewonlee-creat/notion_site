@@ -1,6 +1,20 @@
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
 import Head from 'next/head'
 
-export default function Home() {
+export async function getStaticProps() {
+  const files = fs.readdirSync(path.join('src/content'));
+  const posts = files.map((filename) => {
+    const slug = filename.replace('.md', '');
+    const md = fs.readFileSync(path.join('src/content', filename), 'utf-8');
+    const { data } = matter(md);
+    return { slug, title: data.title || slug };
+  });
+  return { props: { posts } };
+}
+
+export default function Home({ posts }) {
   return (
     <div>
       <Head>
@@ -9,9 +23,15 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <h1>Notion Site</h1>
-        <p>Notion 데이터베이스의 내용이 여기에 표시됩니다.</p>
+      <main style={{ padding: 32, fontFamily: 'sans-serif' }}>
+        <h1>Chaewon's Notion Blog</h1>
+        <ul>
+          {posts.map((p) => (
+            <li key={p.slug}>
+              <a href={`/${p.slug}`}>{p.title}</a>
+            </li>
+          ))}
+        </ul>
       </main>
     </div>
   )
