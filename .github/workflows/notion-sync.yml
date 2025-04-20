@@ -58,7 +58,7 @@ jobs:
           git config user.email "bot@example.com"
           git add src/content
           git commit -m "auto: notion sync" || exit 0
-          git push
+          git push https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git HEAD:main
 
       # Vercel 배포 트리거
       - name: Trigger Vercel Deployment
