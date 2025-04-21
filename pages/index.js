@@ -11,27 +11,31 @@ export async function getStaticProps() {
     const { data } = matter(md);
     return { slug, title: data.title || slug };
   });
-  return { props: { posts } };
+  return { props: { posts }, revalidate: 60 };
 }
 
 export default function Home({ posts }) {
   return (
     <div>
       <Head>
-        <title>Notion Site</title>
+        <title>Chaewon's Notion Blog</title>
         <meta name="description" content="Notion으로 만든 웹사이트" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main style={{ padding: 32, fontFamily: 'sans-serif' }}>
         <h1>Chaewon's Notion Blog</h1>
-        <ul>
-          {posts.map((p) => (
-            <li key={p.slug}>
-              <a href={`/${p.slug}`}>{p.title}</a>
-            </li>
-          ))}
-        </ul>
+        {posts.length === 0 ? (
+          <p>🚧 첫 글 준비 중! 곧 업데이트됩니다.</p>
+        ) : (
+          <ul>
+            {posts.map((p) => (
+              <li key={p.slug}>
+                <a href={`/${p.slug}`}>{p.title}</a>
+              </li>
+            ))}
+          </ul>
+        )}
       </main>
     </div>
   )
