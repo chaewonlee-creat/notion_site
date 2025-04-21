@@ -20,10 +20,34 @@ export async function getStaticProps() {
 export default function Home({ posts }) {
   if (!posts.length) {
     return (
-      <main style={{ padding: 32, fontFamily: 'sans-serif' }}>
-        <h1>Chaewon's Notion Blog</h1>
-        <p>🚧 게시글이 없습니다. 곧 업데이트됩니다.</p>
-      </main>
+      <div className="main-container">
+        <main className="hero-section">
+          <h1 className="title">Chaewon's Notion Blog</h1>
+          <p className="subtitle">🚧 게시글이 없습니다. 곧 업데이트됩니다.</p>
+        </main>
+        <style jsx>{`
+          .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+          }
+          .hero-section {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+          }
+          .title {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+          }
+          .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+          }
+        `}</style>
+      </div>
     );
   }
 
@@ -35,16 +59,48 @@ export default function Home({ posts }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main style={{ padding: 32, fontFamily: 'sans-serif' }}>
-        <h1>Chaewon's Notion Blog</h1>
-        <ul>
-          {posts.map(p => (
-            <li key={p.slug}>
-              <a href={`/${p.slug}`}>{p.title}</a>
-            </li>
-          ))}
-        </ul>
-      </main>
+      <div className="main-container">
+        <main className="hero-section">
+          <h1 className="title">Chaewon's Notion Blog</h1>
+          <nav className="nav-menu">
+            {posts.map(p => (
+              <a key={p.slug} href={`/${p.slug}`}>{p.title}</a>
+            ))}
+          </nav>
+        </main>
+        <style jsx>{`
+          .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+          }
+          .hero-section {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+          }
+          .title {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+          }
+          .nav-menu {
+            padding: 1rem 0;
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+          }
+          .nav-menu a {
+            color: #0070f3;
+            text-decoration: none;
+            font-size: 1.2rem;
+          }
+          .nav-menu a:hover {
+            text-decoration: underline;
+          }
+        `}</style>
+      </div>
     </div>
   );
 } 
