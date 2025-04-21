@@ -4,7 +4,9 @@ import matter from 'gray-matter';
 import { marked } from 'marked';
 
 export async function getStaticPaths() {
-  const files = fs.readdirSync(path.join('src/content'));
+  const dir = path.join(process.cwd(), 'src/content');
+  const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+  
   const paths = files.map((filename) => ({
     params: { slug: filename.replace('.md', '') },
   }));
@@ -12,7 +14,14 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params: { slug } }) {
-  const md = fs.readFileSync(path.join('src/content', slug + '.md'), 'utf-8');
+  const dir = path.join(process.cwd(), 'src/content');
+  const filePath = path.join(dir, `${slug}.md`);
+  
+  if (!fs.existsSync(filePath)) {
+    return { notFound: true };
+  }
+  
+  const md = fs.readFileSync(filePath, 'utf-8');
   const { content, data } = matter(md);
   return { props: { front: data, html: marked.parse(content) } };
 }
