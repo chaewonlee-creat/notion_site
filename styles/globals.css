@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset defaults */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Basic image handling */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Markdown content styling */
+.markdown img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem auto;
+  display: block;
+} 

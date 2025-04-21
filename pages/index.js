@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import Head from 'next/head'
+import Head from 'next/head';
+import Link from 'next/link';
 
 export async function getStaticProps() {
   const dir = path.join(process.cwd(), 'src/content');
@@ -18,89 +19,29 @@ export async function getStaticProps() {
 }
 
 export default function Home({ posts }) {
-  if (!posts.length) {
-    return (
-      <div className="main-container">
-        <main className="hero-section">
-          <h1 className="title">Chaewon's Notion Blog</h1>
-          <p className="subtitle">🚧 게시글이 없습니다. 곧 업데이트됩니다.</p>
-        </main>
-        <style jsx>{`
-          .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-          }
-          .hero-section {
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-          }
-          .title {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-          }
-          .subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-          }
-        `}</style>
-      </div>
-    );
-  }
-
   return (
-    <div>
+    <div className="min-h-screen bg-white">
       <Head>
-        <title>Chaewon's Notion Blog</title>
-        <meta name="description" content="Notion으로 만든 웹사이트" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>My Blog</title>
+        <meta name="description" content="Welcome to my blog" />
       </Head>
 
-      <div className="main-container">
-        <main className="hero-section">
-          <h1 className="title">Chaewon's Notion Blog</h1>
-          <nav className="nav-menu">
-            {posts.map(p => (
-              <a key={p.slug} href={`/${p.slug}`}>{p.title}</a>
-            ))}
-          </nav>
-        </main>
-        <style jsx>{`
-          .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-          }
-          .hero-section {
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-          }
-          .title {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-          }
-          .nav-menu {
-            padding: 1rem 0;
-            display: flex;
-            gap: 2rem;
-            justify-content: center;
-          }
-          .nav-menu a {
-            color: #0070f3;
-            text-decoration: none;
-            font-size: 1.2rem;
-          }
-          .nav-menu a:hover {
-            text-decoration: underline;
-          }
-        `}</style>
-      </div>
+      <main className="max-w-screen-md mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold mb-8">Blog Posts</h1>
+        <div className="space-y-4">
+          {posts.map((post) => (
+            <Link 
+              href={`/${post.slug}`} 
+              key={post.slug}
+              className="block p-6 bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors"
+            >
+              <h2 className="text-xl font-semibold text-gray-900 hover:text-blue-600">
+                {post.title}
+              </h2>
+            </Link>
+          ))}
+        </div>
+      </main>
     </div>
   );
 } 
