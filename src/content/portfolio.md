@@ -45,6 +45,7 @@
 
 <details>
 <summary>노션 웹사이트 자동화 시스템 구축 (2025-04)</summary>
+- **링크** · [사이트 바로가기](https://notion-site-git-main-chaewons-projects-8f438e3b.vercel.app/)
 - **프로젝트 개요** · 노션 API를 활용한 웹사이트 자동 업데이트 시스템
 - **사용 기술** · Node.js, Notion API, GitHub Actions
 - **주요 기능**
@@ -62,9 +63,9 @@
     - **역할** · 기획 / UI·UX 디자인 / 프론트엔드
     - **성과** · 런칭 첫 주 5,000+ PV, "비개발자→개발자" 실행력 입증
 - 📈 Elon-Musk-Mode Chatbot (2025-04, 1주)
-    - **역할** · Python 설계 & Rule-Based NLG
-    - **기술** · Python, Regex, Prompt Engineering
-    - **성과** · 105개 영·한 원-라이너 → SNS 밈화, 커뮤니티 레퍼런스
+- **역할** · Python 설계 & Rule-Based NLG
+- **기술** · Python, Regex, Prompt Engineering
+- **성과** · 105개 영·한 원-라이너 → SNS 밈화, 커뮤니티 레퍼런스
 - 주요 내용: AI를 활용한 소셜미디어 콘텐츠 기획 및 제작
 - 사용 기술: ChatGPT, Canva, Premiere Pro
 - 결과: 콘텐츠 평균 조회수 및 반응률 증가, 팔로워 유입 및 개인 브랜드 강화
