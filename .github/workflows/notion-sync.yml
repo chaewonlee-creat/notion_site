@@ -1,9 +1,9 @@
 name: Sync Notion Pages
 
 on:
-  workflow_dispatch: # 수동 실행 가능
+  workflow_dispatch:
   schedule:
-    - cron: '*/10 * * * *'  # 10분마다 자동 실행 (예시)
+    - cron: '*/10 * * * *'
 
 jobs:
   sync_notion:
@@ -19,19 +19,25 @@ jobs:
           node-version: '20'
 
       - run: npm install
+
       - run: |
           cat > .env.local <<EOL
           NOTION_SECRET=${{ secrets.NOTION_SECRET }}
           NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
           EOL
 
-      - run: npm run sync:notion
+      - name: Sync Notion to Markdown
+        run: npm run sync:notion
+        env:
+          GIT_AUTHOR_NAME: chaewonlee-creat
+          GIT_AUTHOR_EMAIL: chaewonlee.creat@gmail.com
+          GIT_COMMITTER_NAME: chaewonlee-creat
+          GIT_COMMITTER_EMAIL: chaewonlee.creat@gmail.com
 
-      # 변경된 사항 자동으로 커밋 후 푸시
-      - name: Commit and Push changes
+      - name: Commit and Push
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "chaewonlee-creat"
+          git config user.email "chaewonlee.creat@gmail.com"
           git add .
           git diff --cached --quiet || git commit -m "Sync from Notion via GitHub Actions"
-          git push
+          git push origin main 
