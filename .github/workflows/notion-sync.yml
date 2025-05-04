@@ -1,72 +1,37 @@
-name: notion-sync
+name: Sync Notion Pages
 
 on:
-  # ❶ 6시간마다 자동
+  workflow_dispatch: # 수동 실행 가능
   schedule:
-    - cron:  '0 */6 * * *'
-  # ❷ 수동 실행 버튼도 하나 만들기
-  workflow_dispatch:
+    - cron: '*/10 * * * *'  # 10분마다 자동 실행 (예시)
 
 jobs:
-  sync:
+  sync_notion:
     runs-on: ubuntu-latest
 
-    env:
-      NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
-      NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-
     steps:
-      # 디버그: 환경 변수 길이 확인
-      - name: debug env
-        run: |
-          echo "🔑  token length : ${#NOTION_SECRET}"
-          echo "🗄   dbID length : ${#NOTION_DATABASE_ID}"
-        env:
-          NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Notion API 직접 테스트
-      - name: quick notion ping
-        run: |
-          echo "Testing Notion API..."
-          curl -s -X POST https://api.notion.com/v1/databases/$NOTION_DATABASE_ID/query \
-            -H "Authorization: Bearer $NOTION_SECRET" \
-            -H "Notion-Version: 2022-06-28" | jq '.object'
-        env:
-          NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-
-      # 프로젝트 파일 다운로드
-      - name: Download project files
-        run: |
-          mkdir -p src/content scripts
-          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3.raw" \
-            -o package.json \
-            "https://api.github.com/repos/${{ github.repository }}/contents/package.json"
-          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3.raw" \
-            -o scripts/notionSync.mjs \
-            "https://api.github.com/repos/${{ github.repository }}/contents/scripts/notionSync.mjs"
-
-      # Node 설치 및 의존성 설치
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
 
-      - run: npm install @notionhq/client notion-to-md dotenv
-
-      # Notion → Markdown 변환 (git 없이)
-      - name: Run notion sync
-        run: |
-          cat > .env.local << EOL
+      - run: npm install
+      - run: |
+          cat > .env.local <<EOL
           NOTION_SECRET=${{ secrets.NOTION_SECRET }}
           NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
           EOL
-          node scripts/notionSync.mjs
 
-      # Vercel 배포 트리거
-      - name: Trigger Vercel Deployment
+      - run: npm run sync:notion
+
+      # 변경된 사항 자동으로 커밋 후 푸시
+      - name: Commit and Push changes
         run: |
-          curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_pJNRqpYuOwajgzTJMamyVZh1RNap" \
-          -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" 
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --cached --quiet || git commit -m "Sync from Notion via GitHub Actions"
+          git push
