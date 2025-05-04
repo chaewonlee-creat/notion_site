@@ -1,56 +1,39 @@
-name: Sync Notion Pages
+name: Manual Notion → Markdown
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '*/10 * * * *'
+  workflow_dispatch:   # ⬅︎ “Run workflow” 버튼으로만 실행
 
 jobs:
-  sync_notion:
+  build_md:
     runs-on: ubuntu-latest
 
     steps:
-      # ① PAT 으로 체크아웃 (한 번만!)
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.PERSONAL_TOKEN }}  # ← repo:write 권한 포함 PAT
+    # ① 리포지토리 Read-only 체크아웃 (GITHUB_TOKEN이면 충분)
+    - uses: actions/checkout@v4
 
-      # ② Node 준비
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+    # ② Node 설치
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
 
-      - run: npm ci   # install 대신 ci 권장
+    - name: Install deps
+      run: npm ci
 
-      # ③ Notion 환경변수 주입
-      - run: |
-          cat > .env.local <<EOL
-          NOTION_SECRET=${{ secrets.NOTION_SECRET }}
-          NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
-          EOL
+    # ③ Notion 비밀 주입
+    - name: Create .env.local
+      run: |
+        cat > .env.local <<'EOF'
+        NOTION_SECRET=${{ secrets.NOTION_SECRET }}
+        NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
+        EOF
 
-      # ④ Notion → MD 변환
-      - name: Sync Notion to Markdown
-        run: npm run sync:notion
-        env:
-          GIT_AUTHOR_NAME: chaewonlee-creat
-          GIT_AUTHOR_EMAIL: chaewonlee.creat@gmail.com
-          GIT_COMMITTER_NAME: chaewonlee-creat
-          GIT_COMMITTER_EMAIL: chaewonlee.creat@gmail.com
+    # ④ 변환 실행 (스크립트는 src/content 아래에 md 파일 생성)
+    - name: Run conversion script
+      run: npm run sync:notion
 
-      # ⑤ 커밋 & 푸시
-      - name: Commit and Push
-        env:
-          PAT: ${{ secrets.PERSONAL_TOKEN }}
-        run: |
-          set -eux
-          git config user.name  "action-bot"
-          git config user.email "actions@github.com"
-
-          git add -A
-          git diff --cached --quiet || git commit -m "Sync from Notion"
-
-          # 원격 URL에 PAT 직접 주입 (이 한 줄이 핵심!)
-          git remote set-url origin https://x-access-token:${PAT}@github.com/${{ github.repository }}.git
-
-          git push origin HEAD:main
+    # ⑤ (선택) 변환된 md를 artefact로 업로드
+    - name: Upload markdown as artefact
+      uses: actions/upload-artifact@v4
+      with:
+        name: notion-md
+        path: src/content/*.md
