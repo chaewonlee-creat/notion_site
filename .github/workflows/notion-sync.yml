@@ -10,22 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ① PAT 으로 체크아웃 (한 번만!)
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          token: ${{ secrets.PERSONAL_TOKEN }}  # ← repo:write 권한 포함 PAT
 
+      # ② Node 준비
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - run: npm install
+      - run: npm ci   # install 대신 ci 권장
 
+      # ③ Notion 환경변수 주입
       - run: |
           cat > .env.local <<EOL
           NOTION_SECRET=${{ secrets.NOTION_SECRET }}
           NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
           EOL
 
+      # ④ Notion → MD 변환
       - name: Sync Notion to Markdown
         run: npm run sync:notion
         env:
@@ -34,10 +38,15 @@ jobs:
           GIT_COMMITTER_NAME: chaewonlee-creat
           GIT_COMMITTER_EMAIL: chaewonlee.creat@gmail.com
 
+      # ⑤ 커밋 & 푸시
       - name: Commit and Push
         run: |
-          git config user.name "chaewonlee-creat"
-          git config user.email "chaewonlee.creat@gmail.com"
-          git add .
+          set -eux
+          git config user.name  "action-bot"
+          git config user.email "actions@github.com"
+
+          git add -A
           git diff --cached --quiet || git commit -m "Sync from Notion via GitHub Actions"
-          git push origin main
+
+          # checkout 시 PAT 로 remote 가 이미 세팅되어 있으므로 바로 push
+          git push origin HEAD:main
