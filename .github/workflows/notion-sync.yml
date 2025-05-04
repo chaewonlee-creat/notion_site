@@ -40,13 +40,17 @@ jobs:
 
       # ⑤ 커밋 & 푸시
       - name: Commit and Push
+        env:
+          PAT: ${{ secrets.PERSONAL_TOKEN }}
         run: |
           set -eux
           git config user.name  "action-bot"
           git config user.email "actions@github.com"
 
           git add -A
-          git diff --cached --quiet || git commit -m "Sync from Notion via GitHub Actions"
+          git diff --cached --quiet || git commit -m "Sync from Notion"
 
-          # checkout 시 PAT 로 remote 가 이미 세팅되어 있으므로 바로 push
+          # 원격 URL에 PAT 직접 주입 (이 한 줄이 핵심!)
+          git remote set-url origin https://x-access-token:${PAT}@github.com/${{ github.repository }}.git
+
           git push origin HEAD:main
