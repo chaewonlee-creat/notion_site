@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PERSONAL_TOKEN }} # ← 여기 중요 변경점!
+          token: ${{ secrets.PERSONAL_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -34,7 +34,7 @@ jobs:
           GIT_COMMITTER_NAME: chaewonlee-creat
           GIT_COMMITTER_EMAIL: chaewonlee.creat@gmail.com
 
-      - name: Commit & Push
+      - name: Commit and Push
         run: |
           git config user.name "chaewonlee-creat"
           git config user.email "chaewonlee.creat@gmail.com"
